@@ -26,9 +26,7 @@ const JobListings = ({ isHome = false }: Props) => {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    const apiUrl = isHome
-      ? "http://localhost:8000/jobs?_limit=3"
-      : "http://localhost:8000/jobs";
+    const apiUrl = isHome ? "/api/jobs?_limit=3" : "/api/jobs";
     const fetchJobs = async () => {
       try {
         setLoading(true);
