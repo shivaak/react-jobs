@@ -1,23 +1,7 @@
 import React, { useState } from "react";
 import { FaMapMarker } from "react-icons/fa";
 import { Link } from "react-router-dom";
-
-interface Company {
-  name: string;
-  description: string;
-  contactEmail: string;
-  contactPhone: string;
-}
-
-interface Job {
-  id: string;
-  title: string;
-  type: string;
-  description: string;
-  location: string;
-  salary: string;
-  company: Company;
-}
+import { Job } from "../types";
 
 interface Props {
   job: Job;
@@ -57,7 +41,7 @@ const JobListing = ({ job }: Props) => {
             {job.location}
           </div>
           <Link
-            to={`/job/${job.id}`}
+            to={`/jobs/${job.id}`}
             className="h-[36px] bg-indigo-500 hover:bg-indigo-600 text-white px-4 py-2 rounded-lg text-center text-sm"
           >
             Read More
