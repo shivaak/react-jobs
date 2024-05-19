@@ -12,6 +12,7 @@ import JobPage, { jobLoader } from "./pages/JobPage";
 import AddJobPage from "./pages/AddJobPage";
 import { Job } from "./types";
 import EditJobPage from "./pages/EditJobPage";
+import ErrorBoundary from "./pages/ErrorBoundary";
 
 const App = () => {
   //Add a new job
@@ -50,20 +51,34 @@ const App = () => {
   const router = createBrowserRouter(
     createRoutesFromElements(
       <Route path="/" element={<MainLayout />}>
-        <Route index element={<HomePage />} />
-        <Route path="/jobs" element={<JobsPage />} />
+        <Route index element={<HomePage />} errorElement={<ErrorBoundary />} />
+        <Route
+          path="/jobs"
+          element={<JobsPage />}
+          errorElement={<ErrorBoundary />}
+        />
         <Route
           path="/jobs/:id"
           element={<JobPage deleteJob={deleteJob} />}
           loader={jobLoader}
+          errorElement={<ErrorBoundary />}
         />
-        <Route path="/add-job" element={<AddJobPage addJobSubmit={addJob} />} />
+        <Route
+          path="/add-job"
+          element={<AddJobPage addJobSubmit={addJob} />}
+          errorElement={<ErrorBoundary />}
+        />
         <Route
           path="/jobs/edit/:id"
           element={<EditJobPage editJobSubmit={editJob} />}
+          errorElement={<ErrorBoundary />}
           loader={jobLoader}
         />
-        <Route path="*" element={<NotFoundPage />} />
+        <Route
+          path="*"
+          element={<NotFoundPage />}
+          errorElement={<ErrorBoundary />}
+        />
       </Route>
     )
   );

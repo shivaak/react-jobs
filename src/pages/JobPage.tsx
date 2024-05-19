@@ -120,6 +120,9 @@ const jobLoader: LoaderFunction<any> = async ({
   params,
 }: LoaderFunctionArgs) => {
   const response = await fetch(`/api/jobs/${params.id}`);
+  if (!response.ok) {
+    throw new Error("Job not found");
+  }
   const job = await response.json();
   return job;
 };
