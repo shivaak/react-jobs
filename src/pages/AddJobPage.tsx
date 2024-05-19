@@ -1,6 +1,7 @@
 import React, { useState } from "react";
 import { Job } from "../types";
 import { useNavigate } from "react-router-dom";
+import { toast } from "react-toastify";
 
 interface AddJobPageProps {
   addJobSubmit: (job: Job) => void;
@@ -35,6 +36,7 @@ const AddJobPage = ({ addJobSubmit }: AddJobPageProps) => {
       },
     };
     addJobSubmit(newJob);
+    toast.success("Job added successfully");
     return navigate("/jobs");
   };
 

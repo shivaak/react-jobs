@@ -7,6 +7,7 @@ import {
   useLoaderData,
   useNavigate,
 } from "react-router-dom";
+import { toast } from "react-toastify";
 
 interface JobPageProps {
   deleteJob: (id: string) => void;
@@ -20,6 +21,7 @@ const JobPage = ({ deleteJob }: JobPageProps) => {
     const confirm = window.confirm("Are you sure you want to delete this job?");
     if (!confirm) return;
     deleteJob(id);
+    toast.success("Job deleted successfully");
     navigate("/jobs");
   };
 
