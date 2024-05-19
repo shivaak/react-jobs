@@ -8,6 +8,7 @@ import {
   useNavigate,
 } from "react-router-dom";
 import { toast } from "react-toastify";
+import { getJobById } from "../services/jobService";
 
 interface JobPageProps {
   deleteJob: (id: string) => void;
@@ -119,12 +120,10 @@ const JobPage = ({ deleteJob }: JobPageProps) => {
 const jobLoader: LoaderFunction<any> = async ({
   params,
 }: LoaderFunctionArgs) => {
-  const response = await fetch(`/api/jobs/${params.id}`);
-  if (!response.ok) {
-    throw new Error("Job not found");
+  if (!params.id) {
+    throw new Error("Job ID is required");
   }
-  const job = await response.json();
-  return job;
+  return getJobById(params.id);
 };
 
 export { JobPage as default, jobLoader };
