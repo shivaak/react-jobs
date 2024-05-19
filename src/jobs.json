@@ -86,16 +86,16 @@
     },
     {
       "id": "b2c2",
-      "title": "asdasd",
-      "description": "asdasd",
-      "type": "Full-Time",
+      "title": "Original Job Name New",
+      "description": "This is a original job description",
+      "type": "Internship",
       "location": "sad",
-      "salary": "Under $50K",
+      "salary": "Over $200K",
       "company": {
-        "name": "",
-        "description": "",
-        "contactEmail": "dsfdsf@a.com",
-        "contactPhone": ""
+        "name": "Hello Hello company",
+        "description": "Description of Hello Hello company",
+        "contactEmail": "hello@a.com",
+        "contactPhone": "123456"
       }
     },
     {
