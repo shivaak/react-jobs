@@ -14,6 +14,7 @@ import EditJobPage from "./pages/EditJobPage";
 import ErrorBoundary from "./pages/ErrorBoundary";
 import { addJob, deleteJob, editJob } from "./services/jobService";
 import LoginPage from "./pages/LoginPage";
+import RegisterPage from "./pages/RegisterPage"; // Import the RegisterPage component
 import AuthLayout from "./layouts/AuthLayout";
 
 const App = () => {
@@ -54,6 +55,11 @@ const App = () => {
           <Route
             path="/login"
             element={<LoginPage />}
+            errorElement={<ErrorBoundary />}
+          />
+          <Route
+            path="/register"
+            element={<RegisterPage />}
             errorElement={<ErrorBoundary />}
           />
         </Route>

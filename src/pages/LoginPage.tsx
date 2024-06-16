@@ -89,6 +89,13 @@ const LoginPage = () => {
             >
               Login
             </button>
+            <button
+              type="button"
+              className="text-indigo-500 hover:text-indigo-600 text-sm"
+              onClick={() => navigate("/register")}
+            >
+              Sign up
+            </button>
           </div>
         </form>
       </div>
