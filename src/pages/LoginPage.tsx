@@ -1,6 +1,7 @@
 import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { toast } from "react-toastify";
+import { login } from "../api/useApi";
 
 const LoginPage = () => {
   const [username, setUsername] = useState("");
@@ -11,7 +12,7 @@ const LoginPage = () => {
   }>({});
   const navigate = useNavigate();
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
 
     const newErrors: { username?: string; password?: string } = {};
@@ -29,7 +30,9 @@ const LoginPage = () => {
     setErrors(newErrors);
 
     if (Object.keys(newErrors).length === 0) {
-      // Handle login logic here
+      const data = await login({ username, password });
+      console.log(data);
+
       toast.success("Login successful!");
       navigate("/");
     } else {

@@ -1,3 +1,9 @@
+export interface ErrorResponse {
+  errorCode: string;
+  errorMessage: string;
+  errors: null | Record<string, any>;
+}
+
 export interface Company {
   name: string;
   description: string;
@@ -13,4 +19,17 @@ export interface Job {
   location: string;
   salary: string;
   company: Company;
+}
+
+export interface UserData {
+  username: string;
+  password: string;
+  confirmPassword: string;
+  firstName: string;
+  lastName: string;
+}
+
+export interface Login {
+  username: string;
+  password: string;
 }

@@ -1,8 +1,9 @@
-import { useEffect, useRef } from "react";
+import React, { useEffect, useState } from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import * as z from "zod";
 import { useNavigate } from "react-router-dom";
+import { registerUser } from "../api/useApi";
 import { toast } from "react-toastify";
 
 const schema = z
@@ -38,22 +39,49 @@ const RegisterPage = () => {
     register,
     handleSubmit,
     formState: { errors },
+    setFocus,
+    setError,
   } = useForm<FormData>({
     resolver: zodResolver(schema),
   });
 
-  const usernameRef = useRef<HTMLInputElement>(null);
+  const [errorMessage, setErrorMessage] = useState<string | null>(null);
+  const [successMessage, setSuccessMessage] = useState<string | null>(null);
 
   useEffect(() => {
-    if (usernameRef.current) {
-      usernameRef.current.focus();
-    }
-  }, []);
+    setFocus("username");
+  }, [setFocus]);
 
-  const onSubmit = (data: FormData) => {
-    // Handle registration logic here
-    toast.success("Registration successful!");
-    navigate("/login");
+  const onSubmit = async (data: FormData) => {
+    try {
+      await registerUser(data);
+      toast.success("User created successfully");
+      navigate("/login");
+    } catch (error: any) {
+      if (isErrorResponse(error)) {
+        setErrorMessage(error.errorMessage || "Registration failed.");
+        if (error.errors) {
+          Object.keys(error.errors).forEach((field) => {
+            setError(field as keyof FormData, {
+              type: "server",
+              message: error.errors[field],
+            });
+          });
+        }
+      } else {
+        setErrorMessage("An unexpected error occurred.");
+      }
+    }
+  };
+
+  const isErrorResponse = (
+    error: any
+  ): error is { errorMessage: string; errors: Record<string, string> } => {
+    return (
+      error &&
+      typeof error.errorMessage === "string" &&
+      typeof error.errors === "object"
+    );
   };
 
   return (
@@ -72,7 +100,6 @@ const RegisterPage = () => {
               type="text"
               id="username"
               {...register("username")}
-              ref={usernameRef}
               className={`shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline ${
                 errors.username ? "border-red-500" : ""
               }`}
@@ -182,6 +209,16 @@ const RegisterPage = () => {
               Back to Login
             </button>
           </div>
+          {errorMessage && !Object.keys(errors).length && (
+            <div className="mt-4 text-red-500 text-sm text-center">
+              {errorMessage}
+            </div>
+          )}
+          {successMessage && (
+            <div className="mt-4 text-green-500 text-sm text-center">
+              {successMessage}
+            </div>
+          )}
         </form>
       </div>
     </div>
