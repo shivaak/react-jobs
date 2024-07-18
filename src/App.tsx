@@ -1,6 +1,4 @@
-//App.tsx
 import { RouterProvider, createBrowserRouter } from "react-router-dom";
-import MainLayout from "./layouts/MainLayout";
 import RequireAuth from "./components/Auth/RequireAuth";
 import { addJob, deleteJob, editJob, jobLoader } from "./services/jobService";
 import AuthLayout from "./layouts/AuthLayout";
@@ -16,6 +14,7 @@ import NotFoundPage from "./pages/NotFoundPage";
 import { AxiosInterceptorProvider } from "./context/AxiosInterceptorContext.tsx";
 import ErrorPage from "./pages/ErrorPage.tsx";
 import PersistLogin from "./components/Auth/PersistLogin.tsx";
+import LoadingLayout from "./layouts/LoadingLayout"; // Import the new LoadingLayout
 
 const authenticatedRoutes = [
   {
@@ -57,7 +56,7 @@ const router = createBrowserRouter([
     element: (
       <PersistLogin>
         <AxiosInterceptorProvider>
-          <MainLayout />
+          <LoadingLayout />
         </AxiosInterceptorProvider>
       </PersistLogin>
     ),
