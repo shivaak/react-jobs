@@ -29,13 +29,6 @@ const PersistLogin = ({ children }: { children: ReactNode }) => {
       setIsLoading(false);
     }
   }, [auth?.accessToken, refresh]);
-
-  /*useEffect(() => {
-    console.log(`isLoading : ${isLoading}`);
-    console.log(`AT : ${JSON.stringify(auth?.accessToken)}`);
-  }, [isLoading]); */
-
-  //return <>{isLoading ? <p>Loading...</p> : <Outlet />}</>;
   return isLoading ? <Spinner loading={isLoading} /> : children || <Outlet />;
 };
 
