@@ -32,7 +32,7 @@ const setupAxiosInterceptors = () => {
           return axiosPrivateInstance(prevRequest);
         } catch (refreshError) {
           setAuth(null);
-          navigate("/login", { state: { from: location }, replace: true });
+          navigate("/auth/login", { state: { from: location }, replace: true });
           return Promise.reject(refreshError);
         }
       }

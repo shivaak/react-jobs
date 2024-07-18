@@ -204,7 +204,7 @@ const RegisterPage = () => {
             <button
               type="button"
               className="text-indigo-500 hover:text-indigo-600 text-sm"
-              onClick={() => navigate("/login")}
+              onClick={() => navigate("/auth/login")}
             >
               Back to Login
             </button>
