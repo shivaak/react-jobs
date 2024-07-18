@@ -3,7 +3,7 @@ import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import * as z from "zod";
 import { useNavigate } from "react-router-dom";
-import { registerUser } from "../api/useApi";
+import { registerUser } from "../services/userService";
 import { toast } from "react-toastify";
 
 const schema = z
@@ -56,7 +56,7 @@ const RegisterPage = () => {
     try {
       await registerUser(data);
       toast.success("User created successfully");
-      navigate("/login");
+      navigate("/auth/login");
     } catch (error: any) {
       if (isErrorResponse(error)) {
         setErrorMessage(error.errorMessage || "Registration failed.");

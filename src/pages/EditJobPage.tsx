@@ -4,7 +4,7 @@ import { useState } from "react";
 import { toast } from "react-toastify";
 
 interface EditJobPageProps {
-  editJobSubmit: (job: Job) => void;
+  editJobSubmit: (job: Job) => Promise<boolean>;
 }
 
 const EditJobPage = ({ editJobSubmit }: EditJobPageProps) => {
@@ -22,7 +22,7 @@ const EditJobPage = ({ editJobSubmit }: EditJobPageProps) => {
   const [salary, setSalary] = useState(job.salary);
   const navigate = useNavigate();
 
-  const submitForm = (e: React.FormEvent) => {
+  const submitForm = async (e: React.FormEvent) => {
     e.preventDefault();
 
     const updatedJob: Job = {
@@ -39,9 +39,17 @@ const EditJobPage = ({ editJobSubmit }: EditJobPageProps) => {
         contactPhone: contactPhone,
       },
     };
-    editJobSubmit(updatedJob);
-    toast.success("Job edited successfully");
-    return navigate(`/jobs/${job.id}`);
+    const success = await editJobSubmit(updatedJob);
+    if (success) {
+      toast.success("Job edited successfully");
+      navigate(`/jobs/${job.id}`);
+    } else {
+      toast.error("Failed to edit job. Please try again.");
+    }
+  };
+
+  const cancelEdit = () => {
+    navigate(`/jobs/${job.id}`);
   };
 
   return (
@@ -227,12 +235,19 @@ const EditJobPage = ({ editJobSubmit }: EditJobPageProps) => {
               />
             </div>
 
-            <div>
+            <div className="flex justify-between">
               <button
-                className="bg-indigo-500 hover:bg-indigo-600 text-white font-bold py-2 px-4 rounded-full w-full focus:outline-none focus:shadow-outline"
+                className="bg-indigo-500 hover:bg-indigo-600 text-white font-bold py-2 px-4 rounded-full w-full mr-2 focus:outline-none focus:shadow-outline"
                 type="submit"
               >
                 Edit Job
+              </button>
+              <button
+                className="bg-gray-500 hover:bg-gray-600 text-white font-bold py-2 px-4 rounded-full w-full ml-2 focus:outline-none focus:shadow-outline"
+                type="button"
+                onClick={cancelEdit}
+              >
+                Cancel
               </button>
             </div>
           </form>

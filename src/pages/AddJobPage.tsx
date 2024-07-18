@@ -4,7 +4,7 @@ import { useNavigate } from "react-router-dom";
 import { toast } from "react-toastify";
 
 interface AddJobPageProps {
-  addJobSubmit: (job: Job) => void;
+  addJobSubmit: (job: Job) => Promise<boolean>;
 }
 
 const AddJobPage = ({ addJobSubmit }: AddJobPageProps) => {
@@ -19,7 +19,7 @@ const AddJobPage = ({ addJobSubmit }: AddJobPageProps) => {
   const [salary, setSalary] = useState("Under $50K");
   const navigate = useNavigate();
 
-  const submitForm = (e: React.FormEvent) => {
+  const submitForm = async (e: React.FormEvent) => {
     e.preventDefault();
 
     const newJob: Job = {
@@ -35,9 +35,13 @@ const AddJobPage = ({ addJobSubmit }: AddJobPageProps) => {
         contactPhone: contactPhone,
       },
     };
-    addJobSubmit(newJob);
-    toast.success("Job added successfully");
-    return navigate("/jobs");
+    const success = await addJobSubmit(newJob);
+    if (success) {
+      toast.success("Job added successfully");
+      navigate("/jobs");
+    } else {
+      toast.error("Failed to add job. Please try again.");
+    }
   };
 
   return (

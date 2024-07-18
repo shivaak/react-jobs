@@ -1,30 +1,33 @@
+// JobPage.tsx
 import { FaArrowLeft, FaMapMarker } from "react-icons/fa";
 import { Job } from "../types";
-import {
-  Link,
-  LoaderFunction,
-  LoaderFunctionArgs,
-  useLoaderData,
-  useNavigate,
-} from "react-router-dom";
+import { Link, useLoaderData, useNavigate } from "react-router-dom";
 import { toast } from "react-toastify";
-import { getJobById } from "../services/jobService";
+import useAuth from "../hooks/useAuth";
 
 interface JobPageProps {
-  deleteJob: (id: string) => void;
+  deleteJob: (id: string) => Promise<boolean>;
 }
 
 const JobPage = ({ deleteJob }: JobPageProps) => {
   const job = useLoaderData() as Job;
   const navigate = useNavigate();
+  const { auth } = useAuth();
 
-  const onDeleteClick = (id: string) => {
+  const onDeleteClick = async (id: string) => {
     const confirm = window.confirm("Are you sure you want to delete this job?");
     if (!confirm) return;
-    deleteJob(id);
-    toast.success("Job deleted successfully");
-    navigate("/jobs");
+
+    const success = await deleteJob(id);
+    if (success) {
+      toast.success("Job deleted successfully");
+      navigate("/jobs");
+    } else {
+      toast.error("Failed to delete job. Please try again.");
+    }
   };
+
+  const isAdmin = auth?.roles.includes(1901);
 
   return (
     <>
@@ -92,23 +95,24 @@ const JobPage = ({ deleteJob }: JobPageProps) => {
                   {job.company.contactPhone}
                 </p>
               </div>
-
               {/* <!-- Manage --> */}
-              <div className="bg-white p-6 rounded-lg shadow-md mt-6">
-                <h3 className="text-xl font-bold mb-6">Manage Job</h3>
-                <Link
-                  to={`/jobs/edit/${job.id}`}
-                  className="bg-indigo-500 hover:bg-indigo-600 text-white text-center font-bold py-2 px-4 rounded-full w-full focus:outline-none focus:shadow-outline mt-4 block"
-                >
-                  Edit Job
-                </Link>
-                <button
-                  onClick={() => job.id && onDeleteClick(job.id)}
-                  className="bg-red-500 hover:bg-red-600 text-white font-bold py-2 px-4 rounded-full w-full focus:outline-none focus:shadow-outline mt-4 block"
-                >
-                  Delete Job
-                </button>
-              </div>
+              {isAdmin && (
+                <div className="bg-white p-6 rounded-lg shadow-md mt-6">
+                  <h3 className="text-xl font-bold mb-6">Manage Job</h3>
+                  <Link
+                    to={`/jobs/edit/${job.id}`}
+                    className="bg-indigo-500 hover:bg-indigo-600 text-white text-center font-bold py-2 px-4 rounded-full w-full focus:outline-none focus:shadow-outline mt-4 block"
+                  >
+                    Edit Job
+                  </Link>
+                  <button
+                    onClick={() => job.id && onDeleteClick(job.id)}
+                    className="bg-red-500 hover:bg-red-600 text-white font-bold py-2 px-4 rounded-full w-full focus:outline-none focus:shadow-outline mt-4 block"
+                  >
+                    Delete Job
+                  </button>
+                </div>
+              )}
             </aside>
           </div>
         </div>
@@ -117,13 +121,4 @@ const JobPage = ({ deleteJob }: JobPageProps) => {
   );
 };
 
-const jobLoader: LoaderFunction<any> = async ({
-  params,
-}: LoaderFunctionArgs) => {
-  if (!params.id) {
-    throw new Error("Job ID is required");
-  }
-  return getJobById(params.id);
-};
-
-export { JobPage as default, jobLoader };
+export default JobPage;

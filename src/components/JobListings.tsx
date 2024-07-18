@@ -1,7 +1,9 @@
+// JobListings.tsx
 import { useEffect, useState } from "react";
-import axios from "axios";
 import JobListing from "./JobListing";
 import Spinner from "./Spinner";
+import { fetchJobs } from "../services/jobService";
+import axios from "axios";
 
 interface Props {
   isHome?: boolean;
@@ -28,26 +30,35 @@ const JobListings = ({ isHome = false }: Props) => {
   const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
-    const apiUrl = isHome ? "/api/jobs?_limit=3" : "/api/jobs";
+    const controller = new AbortController();
 
-    const fetchJobs = async () => {
+    const getJobs = async () => {
+      console.log("Fetching jobs...");
       setLoading(true);
       setError(null); // Reset error state before making a new request
       try {
-        const response = await axios.get(apiUrl);
-        setJobs(response.data);
+        // Wait for 5 seconds before fetching the jobs
+        // await new Promise((resolve) => setTimeout(resolve, 1000));
+        const jobData = await fetchJobs(isHome, controller.signal);
+        setJobs(jobData);
       } catch (error) {
-        setError(
-          "An error occurred while fetching jobs. Please try again later."
-        );
-        // Optionally log the error to an external service like Sentry
-        // Sentry.captureException(error);
+        if (axios.isCancel(error)) {
+          console.log("Fetch canceled");
+        } else {
+          setError(
+            "An error occurred while fetching jobs. Please try again later."
+          );
+        }
       } finally {
         setLoading(false);
       }
     };
 
-    fetchJobs();
+    getJobs();
+
+    return () => {
+      controller.abort();
+    };
   }, [isHome]);
 
   return (
@@ -63,7 +74,7 @@ const JobListings = ({ isHome = false }: Props) => {
           <div className="text-red-500 text-center">{error}</div>
         ) : (
           <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-            {jobs.map((job) => (
+            {jobs?.map((job) => (
               <JobListing key={job.id} job={job} />
             ))}
           </div>

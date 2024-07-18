@@ -1,16 +1,23 @@
 import React, { useState } from "react";
-import { useNavigate } from "react-router-dom";
+import { useLocation, useNavigate } from "react-router-dom";
 import { toast } from "react-toastify";
-import { login } from "../api/useApi";
+import { login } from "../services/userService";
+import useAuth from "../hooks/useAuth";
 
 const LoginPage = () => {
+  const { auth, setAuth } = useAuth();
+  const navigate = useNavigate();
+  const location = useLocation();
+  const from = location.state?.from?.pathname || "/";
+
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
   const [errors, setErrors] = useState<{
     username?: string;
     password?: string;
   }>({});
-  const navigate = useNavigate();
+  const [serverError, setServerError] = useState<string | null>(null);
+  const [isLoading, setIsLoading] = useState(false);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -30,11 +37,29 @@ const LoginPage = () => {
     setErrors(newErrors);
 
     if (Object.keys(newErrors).length === 0) {
-      const data = await login({ username, password });
-      console.log(data);
+      try {
+        setIsLoading(true);
+        const response = await login({ username, password });
 
-      toast.success("Login successful!");
-      navigate("/");
+        const accessToken = response?.data?.token;
+        const roles = response?.data?.roles;
+        setAuth({ roles, accessToken });
+
+        toast.success("Login successful!");
+
+        // Adding this delay to allow the interceptor to get initialized
+        //await new Promise((resolve) => setTimeout(resolve, 1000));
+
+        navigate(from, { replace: true });
+      } catch (error: unknown) {
+        setIsLoading(false);
+        if (error instanceof Error) {
+          setServerError(error.message);
+        } else {
+          setServerError("An unexpected error occurred.");
+        }
+        toast.error("Login failed.");
+      }
     } else {
       toast.error("Please correct the errors.");
     }
@@ -60,6 +85,7 @@ const LoginPage = () => {
               className={`shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline ${
                 errors.username ? "border-red-500" : ""
               }`}
+              disabled={isLoading}
             />
             {errors.username && (
               <p className="text-red-500 text-xs mt-1">{errors.username}</p>
@@ -80,25 +106,39 @@ const LoginPage = () => {
               className={`shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline ${
                 errors.password ? "border-red-500" : ""
               }`}
+              disabled={isLoading}
             />
             {errors.password && (
               <p className="text-red-500 text-xs mt-1">{errors.password}</p>
             )}
           </div>
+          {!isLoading && serverError && (
+            <p className="text-red-500 text-sm mt-1 text-center">
+              {serverError}
+            </p>
+          )}
           <div className="flex items-center justify-between">
             <button
               type="submit"
-              className="bg-indigo-500 hover:bg-indigo-600 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline"
+              disabled={auth?.accessToken !== undefined || isLoading}
+              className={`font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline ${
+                isLoading
+                  ? "bg-gray-400 text-white cursor-not-allowed"
+                  : "bg-indigo-500 hover:bg-indigo-600 text-white"
+              }`}
             >
-              Login
+              {isLoading ? "Logging in..." : "Login"}
             </button>
-            <button
-              type="button"
-              className="text-indigo-500 hover:text-indigo-600 text-sm"
-              onClick={() => navigate("/register")}
-            >
-              Sign up
-            </button>
+            {!isLoading && (
+              <button
+                type="button"
+                disabled={auth?.accessToken !== undefined}
+                className="text-indigo-500 hover:text-indigo-600 text-sm"
+                onClick={() => navigate("/auth/register")}
+              >
+                Sign up
+              </button>
+            )}
           </div>
         </form>
       </div>

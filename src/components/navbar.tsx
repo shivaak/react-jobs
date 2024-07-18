@@ -1,11 +1,20 @@
 import logo from "../assets/images/logo.png";
-import { NavLink } from "react-router-dom";
+import { NavLink, useNavigate } from "react-router-dom";
+import useAuth from "../hooks/useAuth";
 
 const Navbar = () => {
+  const { auth, logout } = useAuth();
+  const navigate = useNavigate();
+
   const linkClass = ({ isActive }: { isActive: boolean }) =>
     isActive
       ? "text-white bg-black hover:bg-gray-900 hover:text-white rounded-md px-3 py-2"
       : "text-white hover:bg-gray-900 hover:text-white rounded-md px-3 py-2";
+
+  const handleLogout = async () => {
+    logout();
+    navigate("/auth/login");
+  };
 
   return (
     <>
@@ -28,12 +37,25 @@ const Navbar = () => {
                   <NavLink to="/jobs" className={linkClass}>
                     Jobs
                   </NavLink>
-                  <NavLink to="/add-job" className={linkClass}>
-                    Add Job
-                  </NavLink>
-                  <NavLink to="/login" className={linkClass}>
-                    Login
-                  </NavLink>
+                  {auth?.roles.includes(1901) && (
+                    <>
+                      <NavLink to="/add-job" className={linkClass}>
+                        Add Job
+                      </NavLink>
+                    </>
+                  )}
+                  {auth ? (
+                    <button
+                      onClick={handleLogout}
+                      className={linkClass({ isActive: false })}
+                    >
+                      Logout
+                    </button>
+                  ) : (
+                    <NavLink to="/auth/login" className={linkClass}>
+                      Login
+                    </NavLink>
+                  )}
                 </div>
               </div>
             </div>
