@@ -1,11 +1,11 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
 import { toast } from "react-toastify";
 import { login } from "../services/userService";
 import useAuth from "../hooks/useAuth";
 
 const LoginPage = () => {
-  const { auth, setAuth } = useAuth();
+  const { auth, setAuth, persist, setPersist } = useAuth();
   const navigate = useNavigate();
   const location = useLocation();
   const from = location.state?.from?.pathname || "/";
@@ -47,9 +47,6 @@ const LoginPage = () => {
 
         toast.success("Login successful!");
 
-        // Adding this delay to allow the interceptor to get initialized
-        //await new Promise((resolve) => setTimeout(resolve, 1000));
-
         navigate(from, { replace: true });
       } catch (error: unknown) {
         setIsLoading(false);
@@ -65,10 +62,20 @@ const LoginPage = () => {
     }
   };
 
+  const togglePersist = () => {
+    setPersist((prev) => !prev);
+  };
+
+  useEffect(() => {
+    localStorage.setItem("persist", JSON.stringify(persist));
+  }, [persist]);
+
   return (
-    <div className="min-h-screen flex items-center justify-center bg-indigo-700">
-      <div className="bg-white p-8 rounded-lg shadow-md w-full max-w-md">
-        <h2 className="text-2xl font-bold mb-6 text-center">Login</h2>
+    <div className="min-h-screen flex items-center justify-center bg-gradient-to-r from-indigo-500 to-purple-500">
+      <div className="bg-white p-8 rounded-lg shadow-lg w-full max-w-md">
+        <h2 className="text-3xl font-bold mb-6 text-center text-gray-900">
+          Login
+        </h2>
         <form onSubmit={handleSubmit}>
           <div className="mb-4">
             <label
@@ -117,14 +124,14 @@ const LoginPage = () => {
               {serverError}
             </p>
           )}
-          <div className="flex items-center justify-between">
+          <div className="flex items-center justify-between mb-4">
             <button
               type="submit"
               disabled={auth?.accessToken !== undefined || isLoading}
               className={`font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline ${
                 isLoading
                   ? "bg-gray-400 text-white cursor-not-allowed"
-                  : "bg-indigo-500 hover:bg-indigo-600 text-white"
+                  : "bg-indigo-600 hover:bg-indigo-700 text-white"
               }`}
             >
               {isLoading ? "Logging in..." : "Login"}
@@ -139,6 +146,18 @@ const LoginPage = () => {
                 Sign up
               </button>
             )}
+          </div>
+          <div className="mb-4 flex items-center">
+            <input
+              type="checkbox"
+              id="trustDevice"
+              checked={persist}
+              onChange={togglePersist}
+              className="mr-2 leading-tight"
+            />
+            <label htmlFor="trustDevice" className="text-gray-700">
+              Trust this device
+            </label>
           </div>
         </form>
       </div>

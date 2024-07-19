@@ -12,6 +12,8 @@ export interface AuthContextType {
     React.SetStateAction<{ roles: number[]; accessToken: string } | null>
   >;
   logout: () => void;
+  persist: boolean;
+  setPersist: React.Dispatch<React.SetStateAction<boolean>>;
 }
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
@@ -21,6 +23,10 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
     roles: number[];
     accessToken: string;
   } | null>(null);
+
+  const [persist, setPersist] = useState<boolean>(
+    JSON.parse(localStorage.getItem("persist") || "false")
+  );
 
   const logout = async () => {
     try {
@@ -32,7 +38,9 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
   };
 
   return (
-    <AuthContext.Provider value={{ auth, setAuth, logout }}>
+    <AuthContext.Provider
+      value={{ auth, setAuth, logout, persist, setPersist }}
+    >
       {children}
     </AuthContext.Provider>
   );

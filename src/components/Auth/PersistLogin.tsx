@@ -3,13 +3,12 @@
 import { ReactNode, useEffect, useState } from "react";
 import useRefreshToken from "../../hooks/useRefreshToken";
 import useAuth from "../../hooks/useAuth";
-import { Outlet } from "react-router-dom";
 import Spinner from "../Spinner";
 
 const PersistLogin = ({ children }: { children: ReactNode }) => {
   const [isLoading, setIsLoading] = useState(true);
   const refresh = useRefreshToken();
-  const { auth } = useAuth();
+  const { auth, persist } = useAuth();
 
   useEffect(() => {
     const verifyRefreshToken = async () => {
@@ -23,13 +22,22 @@ const PersistLogin = ({ children }: { children: ReactNode }) => {
       }
     };
 
-    if (!auth?.accessToken) {
-      verifyRefreshToken();
+    if (persist) {
+      if (!auth?.accessToken) {
+        verifyRefreshToken();
+      } else {
+        setIsLoading(false);
+      }
     } else {
       setIsLoading(false);
     }
-  }, [auth?.accessToken, refresh]);
-  return isLoading ? <Spinner loading={isLoading} /> : children || <Outlet />;
+  }, []);
+
+  if (!persist) {
+    return <>{children}</>;
+  }
+
+  return isLoading ? <Spinner loading={isLoading} /> : children;
 };
 
 export default PersistLogin;
